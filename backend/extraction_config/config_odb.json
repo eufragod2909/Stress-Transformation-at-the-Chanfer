@@ -1,0 +1,18 @@
+{
+    "SABOR": {
+        "odb_path": "C:/Users/adam-jd1r2h3ttnmecz9/Desktop/Arthur/files/SABOR.odb",
+        "step_name": "orthogonalCutting",
+        "frame_target": 11,
+        "instance_name": "EULERIAN-1",
+        "field_basename": "ASSEMBLY_EULERIAN-1_DA718_PENG20-1",
+        "zoi_coordinates": {
+            "x1": -1.25,
+            "x2": -1.40,
+            "y1": 0.00,
+            "y2": 0.02,
+            "z1": 0.79,
+            "z2": 0.90,
+            "ele_size": 1.5e-3
+        }
+    }
+}

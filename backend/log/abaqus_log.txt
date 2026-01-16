@@ -1,0 +1,14 @@
+[Command] Iniciando execução...
+
+[Command] The paths to the directories were successfully created.
+       - Extraction Dir Config Path: C:\Users\adam-jd1r2h3ttnmecz9\Desktop\Arthur\StressTransformationattheCuttingZone\Factor-for-Thermomechanical-Loads-main\backend/extraction_config
+       - Extraction Data Path: C:\Users\adam-jd1r2h3ttnmecz9\Desktop\Arthur\StressTransformationattheCuttingZone\Factor-for-Thermomechanical-Loads-main\backend/data
+[Command] Beggining extraction....
+[Extractor] Extraction of ODB: SABOR
+  [Extraction] Opening ODB: C:/Users/adam-jd1r2h3ttnmecz9/Desktop/Arthur/files/SABOR.odb
+  [Interpolator] Built 3 linear interpolation functions successfully.
+[Extractor] Saving all extracted data to JSON file...
+  [Extraction] File saved to: C:\Users\adam-jd1r2h3ttnmecz9\Desktop\Arthur\StressTransformationattheCuttingZone\Factor-for-Thermomechanical-Loads-main\backend/data\data.json
+  [Interpolator] Functions saved to: C:\Users\adam-jd1r2h3ttnmecz9\Desktop\Arthur\StressTransformationattheCuttingZone\Factor-for-Thermomechanical-Loads-main\backend/data\interpolators.pkl
+       [Extraction] The extraction was completed.
+[Command] End.
