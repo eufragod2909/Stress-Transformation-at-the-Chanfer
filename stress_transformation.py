@@ -51,23 +51,15 @@ if __name__ == "__main__":
 
     with open('backend/data/cpress_nodes.json', "r") as f:
         cpress_data = json.load(f)
-
-    test_x = cpress_data[0]['coordinate'][0]
-    test_z = cpress_data[0]['coordinate'][2]
-
-    print(f"-> Fetching stresses at point: X={test_x}, Z={test_z}")
-
-    s11, s33, s13 = transformer.get_interpolated_stress(test_x, test_z)
     
-    print(f"-> Original stresses:")
-    print(f"   S11: {s11:.4f}")
-    print(f"   S33: {s33:.4f}")
-    print(f"   S13: {s13:.4f}")
+    angle = 0.0
+    for n, ele in enumerate(cpress_data):
+        coords = ele['coordinate']
+        s11_original, s33_original, s13_original = transformer.get_interpolated_stress(coords[0], coords[2])
 
-    angle = 20.0
-    res_20 = transformer.transform_stress(s11, s33, s13, angle)
-    print(f"-> Rotation of {angle}° (Final Result):")
-    print(f"   S11': {res_20['sigma_xx_prime']:.4f}")
-    print(f"   S33': {res_20['sigma_zz_prime']:.4f}")
-    print(f"   S13': {res_20['tau_xz_prime']:.4f}") 
-    print("\n=== END OF TEST ===")
+        
+        transformed_stresses = transformer.transform_stress(s11_original, s33_original, s13_original, angle)
+        sigma_xx_prime = transformed_stresses['sigma_xx_prime']
+        cpress = ele['CPRESS']
+
+        print(f"Node {n}: sigma_xx_prime = {sigma_xx_prime:.3f}, cpress = {cpress:.3f}")
