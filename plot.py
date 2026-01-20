@@ -3,16 +3,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 
-
 class StressPlotter:
-    def __init__(self, stress_data_path):
+    def __init__(self, stress_data_path, cpress_data_path):
         self.stress_data_path = stress_data_path
+        self.cpress_data_path = cpress_data_path
 
-    def load_stress_data(self):
+    def load_cpress_nodes(self):
+        with open(self.cpress_data_path, 'r') as file:
+            data_cpress = json.load(file)
+        return data_cpress
+
+    def load_stress_data(self, name_job):
         with open(self.stress_data_path, 'r') as file:
             data = json.load(file)
         
-        elements = data['SABOR']['elements_zoi']
+        elements = data[name_job]['elements_zoi']
         
         x_coords = []
         z_coords = []
@@ -53,42 +58,77 @@ class StressPlotter:
 
         return sigma_xx_prime, sigma_zz_prime, tau_xz_prime
 
-    def plot_field(self, x, z, stress_values, component_name="Sigma XX Prime"):
+    def plot_field(self, x, z, stress_values, component_name="Sigma XX Prime", cpress_nodes=None):
         triang = tri.Triangulation(x, z)
+        
+        v_min = np.min(stress_values)
+        v_max = 0.0
+        levels = np.linspace(v_min, v_max, 20)
 
         plt.figure(figsize=(10, 6))
         
         contour = plt.tricontourf(
             triang, 
             stress_values, 
-            levels=50, 
+            levels=levels, 
             cmap='jet'
         )
         
         cbar = plt.colorbar(contour)
         cbar.set_label(f'Stress: {component_name} [MPa]')
+        cbar.set_ticks(levels)
+
+        if cpress_nodes:
+            cp_x = [node['coordinate'][0] for node in cpress_nodes]
+            cp_z = [node['coordinate'][2] for node in cpress_nodes]
+            cp_vals = [node['CPRESS'] for node in cpress_nodes]
+            
+            plt.scatter(
+                cp_x, cp_z, 
+                color='white', 
+                edgecolors='black', 
+                marker='o', 
+                s=50, 
+                label='CPRESS Nodes',
+                zorder=10
+            )
+            
+            for i, val in enumerate(cp_vals):
+                plt.annotate(
+                    f"ID: {i+1}, CPRESS: {val:.2f}", 
+                    (cp_x[i], cp_z[i]),
+                    textcoords="offset points", 
+                    xytext=(5, 5), 
+                    ha='left',
+                    fontsize=9,
+                    color='black',
+                    bbox=dict(boxstyle="round,pad=0.3", fc="white", alpha=0.7)
+                )
+
+            plt.legend(loc='upper right')
         
         plt.title(f'Transformed Stress Distribution: {component_name}')
         plt.xlabel('X Coordinate')
         plt.ylabel('Z Coordinate')
-        plt.axis('equal')
         plt.tight_layout()
         plt.show()
 
-
 if __name__ == "__main__":
-    json_path = "backend/data/data.json"
-    plotter = StressPlotter(json_path)
+    stress_json_path = "backend/data/data.json"
+    cpress_json_path = "backend/data/cpress_nodes.json"
+    
+    plotter = StressPlotter(stress_json_path, cpress_json_path)
 
-    try:
-        x, z, s11, s33, s13 = plotter.load_stress_data()
-        
-        angle = -20.0
-        s_xx_p, s_zz_p, t_xz_p = plotter.transform_stress(s11, s33, s13, angle)
+    x, z, s11, s33, s13 = plotter.load_stress_data("SABOR")
+    
+    cpress_points = plotter.load_cpress_nodes()
 
-        plotter.plot_field(x, z, s_xx_p, component_name="Sigma XX Prime")
-        
-    except FileNotFoundError:
-        print(f"File not found: {json_path}")
-    except KeyError as e:
-        print(f"JSON structure error: {e}")
+    angle = -20.0
+    s_xx_p, s_zz_p, t_xz_p = plotter.transform_stress(s11, s33, s13, angle)
+
+    plotter.plot_field(
+        x, z, 
+        s_xx_p, 
+        component_name="Sigma XX Prime", 
+        cpress_nodes=cpress_points
+    )
